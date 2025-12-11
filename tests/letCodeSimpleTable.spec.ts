@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Simple Table Tests", () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto("/table");
+        await page.goto("/table", { waitUntil: "domcontentloaded" });
     });
 
     test.afterEach(async ({ page }) => {
@@ -46,10 +46,16 @@ test.describe("Simple Table Tests", () => {
             const cell = await page.locator("xpath=//table[@id='simpletable' and @name='table']//tbody//tr").nth(i).textContent();
             
             if(cell?.includes(name)) {
-                await page.locator("xpath=//table[@id='simpletable' and @name='table']//tbody//tr//td//input[@class='qe' and @type='checkbox' and @id='second']").check();
+                const searchName = await page.locator("xpath=//table[@id='simpletable' and @name='table']//tbody//tr").nth(i).textContent();
+                const stripName = searchName?.match(/Raj/gi)?.[0] ?? "";
+
+                await page.locator(`xpath=//table[@id='simpletable' and @name='table']//tbody//tr//td//input[@class='qe' and @type='checkbox' and @id='second']`).check();
+
+                console.log(`Marked ${stripName} as present`);
                 break;
-            }
-            console.log(cell);
+            }  
         }
+
+        await new Promise((resolve) => setTimeout(resolve, 5000));
     })
 });
