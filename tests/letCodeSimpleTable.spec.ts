@@ -57,5 +57,63 @@ test.describe("Simple Table Tests", () => {
         }
 
         await new Promise((resolve) => setTimeout(resolve, 5000));
-    })
+    });
+
+    [
+        { index: 0, expected: "Not sorted" },
+        { index: 1, expected: "Sorted in ascending order" },
+        { index: 2, expected: "Not sorted" },
+        { index: 3, expected: "Not sorted" },
+        { index: 4, expected: "Not sorted" },
+        { index: 5, expected: "Not sorted" }
+    ].forEach(({ index, expected }) => {
+        test(`Check if the sorting is working properly for column ${index}`, async ({ page }) => {
+            const tableCells = page.locator('table.mat-sort.table tbody tr');
+
+            const getColumnValues = async (colIndex: number): Promise<string[]> => {
+                const cellCount = await tableCells.count();
+                const values: string[] = [];
+                for (let i = 0; i < cellCount; i++) {
+                    const text = await tableCells.nth(i).locator('td').nth(colIndex).textContent();
+                    values.push(text?.trim() || "");
+                }
+                return values;
+            }
+
+            const originalValue = await getColumnValues(index);
+            console.log(`Original Values: ${originalValue}`);
+
+            // Determine if column is numeric
+            const isNumeric = originalValue.every(val => !isNaN(Number(val)));
+
+            let sortedAsc: string[];
+            let sortedDesc: string[];
+
+            if (isNumeric) {
+                const numericOriginal = originalValue.map(Number);
+                sortedAsc = [...numericOriginal].sort((a, b) => a - b).map(String);
+                sortedDesc = [...numericOriginal].sort((a, b) => b - a).map(String);
+            } else {
+                sortedAsc = [...originalValue].sort((a, b) => a.localeCompare(b));
+                sortedDesc = [...originalValue].sort((a, b) => b.localeCompare(a));
+            }
+
+            const isEqual = (a: string[], b: string[]) =>
+                a.length === b.length && a.every((v, i) => v === b[i]);
+
+            const sorting = 
+                isEqual(originalValue, sortedAsc)
+                    ? "Sorted in ascending order"
+                    : isEqual(originalValue, sortedDesc)
+                        ? "Sorted in descending order"
+                        : "Not sorted";
+
+            console.log(`Sorting: ${sorting}`);
+            console.log('Ascending:', sortedAsc);
+            console.log('Descending:', sortedDesc);
+
+            await expect(sorting).toBe(expected);
+        });
+    });
+
 });
