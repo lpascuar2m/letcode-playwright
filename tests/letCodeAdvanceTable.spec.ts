@@ -41,13 +41,13 @@ test.describe("Simple Table Tests", () => {
 
 
     const paginationScenario = [
-        {scenario: "Next", entries: 5, expectedPages: 10},
-        {scenario: "Next", entries: 10, expectedPages: 5},
-        {scenario: "Next", entries: 25, expectedPages: 2},
+        {scenario: "Next", entries: 5, expectedPageNumber: 10},
+        {scenario: "Next", entries: 10, expectedPageNumber: 5},
+        {scenario: "Next", entries: 25, expectedPageNumber: 2},
     ];
     
     paginationScenario.forEach(item => {
-        const { scenario, entries, expectedPages } = item;
+        const { scenario, entries, expectedPageNumber } = item;
         const title = `Test for ${scenario} - Page (${entries})`;
         
         test(title, async ({ page }) => {
@@ -69,7 +69,7 @@ test.describe("Simple Table Tests", () => {
                         
                     if (isDisabledNext) {
                         console.log(`Page ${pageCount} - End Page`);
-                        await expect(pageCount).toBe(expectedPages);
+                        await expect(pageCount).toBe(expectedPageNumber);
                         break;
                     }
 
