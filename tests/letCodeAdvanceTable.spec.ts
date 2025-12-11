@@ -19,8 +19,11 @@ test.describe("Simple Table Tests", () => {
         { number: 25, expected: 25 }
     ];
     
-    pageEntries.forEach(({ number, expected }) => {
-        test(`Test for ${number} entries per page`, async ({ page }) => {
+    pageEntries.forEach(item => {
+        const { number, expected } = item;
+        const title = `Test for ${number} entries per page`;
+        
+        test(title, async ({ page }) => {
             const selectEntries = page.locator("xpath=//select[@class='dt-input']");
             await selectEntries.selectOption(number.toString());
 
@@ -41,19 +44,11 @@ test.describe("Simple Table Tests", () => {
         {scenario: "Next", entries: 5, expectedPages: 10},
         {scenario: "Next", entries: 10, expectedPages: 5},
         {scenario: "Next", entries: 25, expectedPages: 2},
-
-        {scenario: "Sorting", index: 0, expected: "Sorted in ascending order"},
-        {scenario: "Sorting", index: 1, expected: "Sorted in ascending order"},
-        {scenario: "Sorting", index: 2, expected: "Sorted in ascending order"},
-        {scenario: "Sorting", index: 3, expected: "Sorted in ascending order"},
-        {scenario: "Sorting", index: 4, expected: "Sorted in ascending order"},
-        {scenario: "Sorting", index: 5, expected: "Sorted in ascending order"}
     ];
     
     paginationScenario.forEach(item => {
-
-        const { scenario, entries, expectedPages, index, expected } = item;
-        const title = `Test for ${scenario} - ${scenario === 'Next' ? `Page (${entries})` : `Sorting (Column ${index})`}`;
+        const { scenario, entries, expectedPages } = item;
+        const title = `Test for ${scenario} - Page (${entries})`;
         
         test(title, async ({ page }) => {
             const nextPage = async (entries: number) => {
@@ -83,13 +78,26 @@ test.describe("Simple Table Tests", () => {
                     await page.waitForTimeout(100);
                 }
             }
-
-            if(scenario === "Next") {
-                await nextPage(entries!);
-            }
-
-            
+            await nextPage(entries!);
         })
     });
+
+    const sortingScenario = [
+        {scenario: "Sorting", index: 0, expected: "Sorted in ascending order"},
+        {scenario: "Sorting", index: 1, expected: "Sorted in ascending order"},
+        {scenario: "Sorting", index: 2, expected: "Sorted in ascending order"},
+        {scenario: "Sorting", index: 3, expected: "Sorted in ascending order"},
+        {scenario: "Sorting", index: 4, expected: "Sorted in ascending order"},
+        {scenario: "Sorting", index: 5, expected: "Sorted in ascending order"}
+    ];
+
+    sortingScenario.forEach(item => {
+        const { scenario, index, expected } = item;
+        const title = `Test for ${scenario} - Column (${index})`;
+        
+        test(title, async ({ page }) => {
+            
+        })
+    })
  
 });
