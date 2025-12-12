@@ -11,7 +11,6 @@ test.describe("Simple Table Tests", () => {
         await page.close();
     });
 
-
     // Test for entries per page
     const pageEntries = [
         { number: 5, expected: 5 },
