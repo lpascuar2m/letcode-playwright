@@ -1,7 +1,8 @@
 import { test, expect } from "@playwright/test";
+import * as scenarios from '../scenario/scenarios.ts'
 
 // test.use({ headless: true })
-test.describe.configure({ mode: "serial" });
+test.describe.configure({ mode: "default" });
 test.describe("Simple Table Tests", () => {
     test.beforeEach(async ({ page }) => {
         await page.goto("/advancedtable", { waitUntil: "domcontentloaded" });
@@ -11,20 +12,13 @@ test.describe("Simple Table Tests", () => {
         await page.close();
     });
 
-    // Test for entries per page
-    const pageEntries = [
-        { number: 5, expected: 5 },
-        { number: 10, expected: 10 },
-        { number: 25, expected: 25 }
-    ];
-    
-    pageEntries.forEach(item => {
-        const { number, expected } = item;
-        const title = `Test for ${number} entries per page`;
+    scenarios.pageEntriesScenario.forEach(item => {
+        const { scenario, entries, expected } = item;
+        const title = `Test for ${scenario} entries per page`;
         
         test(title, async ({ page }) => {
             const selectEntries = page.locator("xpath=//select[@class='dt-input']");
-            await selectEntries.selectOption(number.toString());
+            await selectEntries.selectOption(entries.toString());
 
             const tableRow = page.locator("xpath=//table//tbody//tr");
             const tableRowCount = await tableRow.count();
@@ -39,13 +33,7 @@ test.describe("Simple Table Tests", () => {
     });
 
 
-    const paginationScenario = [
-        {scenario: "Next", entries: 5, expectedPageNumber: 10},
-        {scenario: "Next", entries: 10, expectedPageNumber: 5},
-        {scenario: "Next", entries: 25, expectedPageNumber: 2},
-    ];
-    
-    paginationScenario.forEach(item => {
+    scenarios.paginationScenario.forEach(item => {
         const { scenario, entries, expectedPageNumber } = item;
         const title = `Test for ${scenario} - Page (${entries})`;
         
@@ -81,16 +69,7 @@ test.describe("Simple Table Tests", () => {
         })
     });
 
-    const sortingScenario = [
-        {scenario: "Sorting", index: 0, expected: "Sorted in ascending order"},
-        {scenario: "Sorting", index: 1, expected: "Sorted in ascending order"},
-        {scenario: "Sorting", index: 2, expected: "Sorted in ascending order"},
-        {scenario: "Sorting", index: 3, expected: "Sorted in ascending order"},
-        {scenario: "Sorting", index: 4, expected: "Sorted in ascending order"},
-        {scenario: "Sorting", index: 5, expected: "Sorted in ascending order"}
-    ];
-
-    sortingScenario.forEach(item => {
+    scenarios.sortingScenario.forEach(item => {
         const { scenario, index, expected } = item;
         const title = `Test for ${scenario} - Column (${index})`;
         
